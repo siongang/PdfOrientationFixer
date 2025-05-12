@@ -338,7 +338,6 @@ export default function ProcessPage() {
       </div>
       <div className="items-center h-full">
         <PageControls
-          rotation={rotation}
           orientation={orientation} // ✅ pass current state
           onRotateLeft={handleOnRotateLeft}
           onRotateRight={handleOnRotateRight}
@@ -347,7 +346,6 @@ export default function ProcessPage() {
           onFixOrientation={handleOnFixOrientation}
           onMerge={() => handleOnMerge(Object.values(fileMap))}
           onDownload={() => downloadPdf(Object.values(fileMap))} // Pass the fileMap to the download function
-          orientationState={orientationState} // Pass the state to the component
         />
       </div>
     </main>

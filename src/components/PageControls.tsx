@@ -3,10 +3,8 @@
 import { RotateCcw, RotateCw } from "lucide-react";
 
 type OrientationMode = "none" | "portrait" | "landscape";
-type OrientationState = "Not Running"| "Running OCR" | "Done";
 
 type Props = {
-  rotation: number;
   orientation: OrientationMode;
   onRotateLeft: () => void;
   onRotateRight: () => void;
@@ -15,11 +13,9 @@ type Props = {
   onFixOrientation: () => void;
   onMerge: () => void;
   onDownload: () => void;
-  orientationState: OrientationState
 };
 
 export default function PageControls({
-  rotation,
   orientation,
   onRotateLeft,
   onRotateRight,
@@ -27,7 +23,6 @@ export default function PageControls({
   onSetOrientation,
   onMerge,
   onDownload,
-  orientationState,
 }: Props) {
   const orientationButtons: { label: string; value: OrientationMode }[] = [
     { label: "None", value: "none" },
