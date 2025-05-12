@@ -17,6 +17,7 @@ export default function PDFPageCanvas({
   const [thumbUrl, setThumbUrl] = useState<string | null>(null);
 
   useEffect(() => {
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfjsLib = require("pdfjs-dist");
 pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 

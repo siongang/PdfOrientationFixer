@@ -51,6 +51,7 @@ export default function ProcessPage() {
 
   useEffect(() => {
     const buildFileMap = async () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const pdfjsLib = require("pdfjs-dist");
       pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
