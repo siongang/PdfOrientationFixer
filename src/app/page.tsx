@@ -40,7 +40,7 @@ return (
       Ever had lecture notes or documents with randomly rotated pages?
       Instead of rotating your head to read, use <strong>PDF Orientation Fixer</strong> to auto-rotate pages using OCR, manually adjust/rotate them, merge files, and download the results.
       <br />
-      Upload speed may be slow for large files, but we're working on it!
+      Upload speed may be slow for large files, but we&apos;re working on it!
     </p>
 
     <button

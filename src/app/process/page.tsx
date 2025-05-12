@@ -16,7 +16,7 @@ export default function ProcessPage() {
   const searchParams = useSearchParams();
   const raw = searchParams.get("ids");
   const fileIds = useMemo(() => (raw ? JSON.parse(raw) : []), [raw]);
-  const [publicFileUrls, setPublicFileUrls] = useState<string[]>([]);
+  // const [publicFileUrls, setPublicFileUrls] = useState<string[]>([]);
 
   type PageInfo = {
     pageNum: number;
