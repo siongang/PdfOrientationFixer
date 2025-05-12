@@ -13,61 +13,53 @@ export default function PDFPageCanvas({
   scale?: number;
   onCanvasReady?: (canvas: HTMLCanvasElement) => void;
 }) {
-  //   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [thumbUrl, setThumbUrl] = useState<string | null>(null);
+  const [isLandscape, setIsLandscape] = useState<boolean>(false);
 
   useEffect(() => {
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfjsLib = require("pdfjs-dist");
-pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+    // only in browser
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const pdfjsLib = require("pdfjs-dist");
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
     const renderThumbnail = async () => {
-      const loadingTask = pdfjsLib.getDocument(url);
-      const pdf = await loadingTask.promise;
-      const page = await pdf.getPage(pageNum);
-      const viewport = page.getViewport({ scale });
-
-      const canvas = document.createElement("canvas");
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-
-      const context = canvas.getContext("2d");
-      if (!context) return;
-
-      await page.render({ canvasContext: context, viewport }).promise;
-
-      // Get PNG data URL
-      const dataUrl = canvas.toDataURL("image/png");
-      setThumbUrl(dataUrl);
-    };
-    const renderCanvasForOCR = async () => {
       const pdf = await pdfjsLib.getDocument(url).promise;
       const page = await pdf.getPage(pageNum);
-      const viewport = page.getViewport({ scale: 2 });
 
+      // get native size
+      const nativeVp = page.getViewport({ scale: 1 });
+      setIsLandscape(nativeVp.width > nativeVp.height);
+
+      // compute a scale so the long edge is always 138px
+      const TARGET_LONG = 138;
+      const factor = TARGET_LONG / Math.max(nativeVp.width, nativeVp.height);
+      const vp = page.getViewport({ scale: factor });
+
+      // render to canvas
       const canvas = document.createElement("canvas");
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
+      canvas.width = vp.width;
+      canvas.height = vp.height;
+      const ctx = canvas.getContext("2d")!;
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
 
-      const context = canvas.getContext("2d");
-      if (!context) return;
-
-      await page.render({ canvasContext: context, viewport }).promise;
-
-      if (onCanvasReady) onCanvasReady(canvas);
+      setThumbUrl(canvas.toDataURL());
+      onCanvasReady?.(canvas);
     };
 
     renderThumbnail();
-    renderCanvasForOCR();
-  }, [url, pageNum, scale, onCanvasReady]);
+  }, [url, pageNum, onCanvasReady]);
 
-  if (!thumbUrl) return <p>Loading...</p>;
+  if (!thumbUrl) return <p>Loading…</p>;
+
+  const sizeClass = isLandscape
+    ? "w-[138px] h-[100px]"
+    : "w-[100px] h-[138px]";
 
   return (
     <img
       src={thumbUrl}
-      alt={`PDF page ${pageNum} thumbnail`}
-      className="w-[100px] h-[138px]  rounded shadow"
+      alt={`PDF page ${pageNum}`}
+      className={`rounded shadow ${sizeClass}`}
     />
   );
 }
