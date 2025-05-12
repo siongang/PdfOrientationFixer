@@ -23,7 +23,6 @@ export default function PageControls({
   onRotateRight,
   onReset,
   onSetOrientation,
-  onFixOrientation,
   onMerge,
   onDownload,
 }: Props) {

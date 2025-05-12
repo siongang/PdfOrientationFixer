@@ -10,7 +10,7 @@ import { detectBestOrientation } from "@/app/process/detectTextOrientationWithOC
 
 import { RotateCw } from "lucide-react";
 
-import { PDFDocument, PDFPage, degrees } from "pdf-lib";
+import { PDFDocument, degrees } from "pdf-lib";
 
 export default function ProcessPage() {
   const searchParams = useSearchParams();
