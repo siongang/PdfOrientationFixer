@@ -30,10 +30,10 @@ export default function PDFPageCanvas({
       const nativeVp = page.getViewport({ scale: 1 });
       setIsLandscape(nativeVp.width > nativeVp.height);
 
-      // compute a scale so the long edge is always 138px
-      const TARGET_LONG = 138;
-      const factor = TARGET_LONG / Math.max(nativeVp.width, nativeVp.height);
-      const vp = page.getViewport({ scale: factor });
+    //   // compute a scale so the long edge is always 138px
+    //   const TARGET_LONG = 138;
+    //   const factor = TARGET_LONG / Math.max(nativeVp.width, nativeVp.height);
+      const vp = page.getViewport({ scale: scale });
 
       // render to canvas
       const canvas = document.createElement("canvas");
@@ -45,9 +45,27 @@ export default function PDFPageCanvas({
       setThumbUrl(canvas.toDataURL());
       onCanvasReady?.(canvas);
     };
+   const renderCanvasForOCR = async () => {
+      const pdf = await pdfjsLib.getDocument(url).promise;
+      const page = await pdf.getPage(pageNum);
+      const viewport = page.getViewport({ scale: 2 });
+    
 
+      const canvas = document.createElement("canvas");
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      const context = canvas.getContext("2d");
+      if (!context) return;
+
+      await page.render({ canvasContext: context, viewport }).promise;
+
+      if (onCanvasReady) onCanvasReady(canvas);
+    };
     renderThumbnail();
-  }, [url, pageNum, onCanvasReady]);
+    renderCanvasForOCR();
+gi
+}, [url, pageNum, onCanvasReady]);
 
   if (!thumbUrl) return <p>Loading…</p>;
 
