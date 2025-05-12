@@ -1,3 +1,4 @@
+"use client";
 import { PDFDocument, degrees } from "pdf-lib";
 import { readFile, writeFile } from 'fs/promises';
 

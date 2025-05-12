@@ -3,11 +3,11 @@
 import { supabase } from "@/lib/supabaseClient";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import * as pdfjsLib from "pdfjs-dist";
 import PDFPageCanvas from "@/components/PDFPageCanvas";
 import PageControls from "@/components/PageControls";
 import { detectBestOrientation } from "@/app/process/detectTextOrientationWithOCR";
-pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs"; // Or the path to your worker on a CDN
+
+
 import { RotateCw } from "lucide-react";
 
 import { PDFDocument, degrees } from "pdf-lib";
@@ -51,6 +51,9 @@ export default function ProcessPage() {
 
   useEffect(() => {
     const buildFileMap = async () => {
+      const pdfjsLib = require("pdfjs-dist");
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+
       // Parent Div
       const newMap: FileData = {};
       for (const id of fileIds) {
@@ -217,7 +220,7 @@ export default function ProcessPage() {
   }
 
   return (
-    <main className="flex-1 grid grid-cols-[1fr_20rem] bg-white text-black">
+    <main className="flex-1 grid grid-cols-[1fr_30rem] bg-white text-black">
       <div>
         {fileIds.map((id: string) => {
           return (

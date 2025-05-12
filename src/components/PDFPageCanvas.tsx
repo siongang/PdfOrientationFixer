@@ -1,9 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import * as pdfjsLib from "pdfjs-dist";
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs"; // Or the path to your worker on a CDN
 
 export default function PDFPageCanvas({
   url,
@@ -16,11 +13,13 @@ export default function PDFPageCanvas({
   scale?: number;
   onCanvasReady?: (canvas: HTMLCanvasElement) => void;
 }) {
-//   const canvasRef = useRef<HTMLCanvasElement>(null);
+  //   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [thumbUrl, setThumbUrl] = useState<string | null>(null);
 
-  
   useEffect(() => {
+const pdfjsLib = require("pdfjs-dist");
+pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+
     const renderThumbnail = async () => {
       const loadingTask = pdfjsLib.getDocument(url);
       const pdf = await loadingTask.promise;
