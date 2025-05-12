@@ -34,24 +34,31 @@ export default function HomePage() {
       router.push(`/process?ids=${encodeURIComponent(JSON.stringify(ids))}`);
     }
   };
+return (
+  <main className="w-full flex flex-col items-center min-h-screen px-6 py-16 items-center text-black gap-8 text-center">
+    <p className="max-w-2xl text-lg items-center leading-relaxed">
+      Ever had lecture notes or documents with randomly rotated pages?
+      Instead of rotating your head to read, use <strong>PDF Orientation Fixer</strong> to auto-rotate pages using OCR, manually adjust/rotate them, merge files, and download the results.
+      <br />
+      Upload speed may be slow for large files, but we're working on it!
+    </p>
 
-  return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
-      <h1 className="text-4xl font-bold mb-8">File Orientation Fixer</h1>
-      <button
-        onClick={() => inputRef.current?.click()}
-        className="bg-white text-black px-6 py-3 rounded hover:bg-gray-200 transition"
-      >
-        Upload Files
-      </button>
-      <input
-        type="file"
-        accept=".pdf,image/*"
-        ref={inputRef}
-        onChange={handleFileChange}
-        multiple
-        className="hidden"
-      />
-    </main>
-  );
+    <button
+      onClick={() => inputRef.current?.click()}
+      className="bg-red-600 text-white w-60 text-lg font-semibold px-8 py-4 rounded-lg hover:bg-red-700 transition"
+    >
+      Select PDF Files
+    </button>
+
+    <input
+      type="file"
+      accept=".pdf,image/*"
+      ref={inputRef}
+      onChange={handleFileChange}
+      multiple
+      className="hidden"
+    />
+  </main>
+);
+
 }
