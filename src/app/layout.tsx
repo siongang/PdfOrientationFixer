@@ -2,7 +2,7 @@
 import { Suspense } from "react";
 import "./globals.css"; // your global styles
 import Header from "@/components/Header";
-
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata = {
   title: "PDF Orientation",
@@ -26,6 +26,7 @@ export default function RootLayout({
           {" "}
           <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
         </main>
+        <Analytics />
       </body>
     </html>
   );
