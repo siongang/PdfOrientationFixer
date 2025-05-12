@@ -265,7 +265,7 @@ export default function ProcessPage() {
 
   return (
     <main className="flex-1 grid grid-cols-[1fr_30rem] bg-white text-black">
-      <div>
+      <div className="flex-1 overflow-auto">
         {fileIds.map((id: string) => {
           return (
             // Parent Div for each File Preview track
