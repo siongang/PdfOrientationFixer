@@ -52,7 +52,7 @@ export default function HomePage() {
         onClick={() => {
           inputRef.current?.click();
         }}
-        className="bg-red-600 text-white w-60 text-lg font-semibold px-8 py-4 rounded-lg hover:bg-red-700 transition"
+        className="bg-red-600 text-white w-60 text-lg font-semibold px-8 py-4 rounded-lg hover:cursor-pointer hover:bg-red-700 transition"
       >
         {uploadingFile ? (
           <span className="animate-spin">Uploading...</span>
