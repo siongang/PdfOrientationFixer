@@ -219,13 +219,13 @@ export default function ProcessPage() {
   return (
     <main className="flex-1 grid grid-cols-[1fr_20rem] bg-white text-black">
       <div>
-        {fileIds.map((id: string, index: number) => {
+        {fileIds.map((id: string) => {
           return (
             // Parent Div for each File Preview track
             <div key={id} className="px-6 py-6">
               {/* <p>File ID: {id}</p> */}
               <div key={id} className="flex flex-wrap">
-                {fileMap[id]?.pages?.map((pageInfo: PageInfo, index) => {
+                {fileMap[id]?.pages?.map((pageInfo: PageInfo) => {
                   return (
                     // Child Div for each page in the file
                     <div

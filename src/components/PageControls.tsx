@@ -1,6 +1,6 @@
 "use client";
 
-import { RotateCcw, RotateCw, Download, FilePlus2 } from "lucide-react";
+import { RotateCcw, RotateCw } from "lucide-react";
 
 type OrientationMode = "none" | "portrait" | "landscape";
 

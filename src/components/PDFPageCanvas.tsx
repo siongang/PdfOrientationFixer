@@ -16,11 +16,9 @@ export default function PDFPageCanvas({
   scale?: number;
   onCanvasReady?: (canvas: HTMLCanvasElement) => void;
 }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+//   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [thumbUrl, setThumbUrl] = useState<string | null>(null);
 
-  const desiredWidth = 160;
-  const desiredHeight = 220;
   
   useEffect(() => {
     const renderThumbnail = async () => {

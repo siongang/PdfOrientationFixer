@@ -1,4 +1,4 @@
-import { PDFDocument, degrees, PageSizes } from "pdf-lib";
+import { PDFDocument, degrees } from "pdf-lib";
 import { readFile, writeFile } from 'fs/promises';
 
 
@@ -53,15 +53,3 @@ export async function rotateAllPages(
 }
 
 
-/**
- * (Coming Soon) Sets the page orientation to portrait or landscape.
- * Could be based on height vs width.
- */
-export async function setPageOrientation(
-  pdfBuffer: Buffer,
-  desired: 'portrait' | 'landscape'
-): Promise<Buffer> {
-  // TODO: implement logic to swap width/height if needed
-  // Might involve recreating each page in new dimensions
-  return pdfBuffer;
-}
