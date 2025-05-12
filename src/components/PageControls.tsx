@@ -12,6 +12,7 @@ type Props = {
   onReset: () => void;
   onSetOrientation: (mode: OrientationMode) => void;
   onFixOrientation: () => void;
+  onMerge: () => void;
   onDownload: () => void;
 };
 
@@ -23,6 +24,7 @@ export default function PageControls({
   onReset,
   onSetOrientation,
   onFixOrientation,
+  onMerge,
   onDownload,
 }: Props) {
   const orientationButtons: { label: string; value: OrientationMode }[] = [
@@ -99,7 +101,7 @@ export default function PageControls({
 
         {/* Merge Button */}
         <button
-          onClick={onFixOrientation}
+          onClick={onMerge}
           className="px-4 py-2 text-sm bg-neutral-100 hover:bg-neutral-200 rounded-lg shadow-sm transition"
         >
           Merge PDFs

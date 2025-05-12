@@ -8,10 +8,9 @@ import PDFPageCanvas from "@/components/PDFPageCanvas";
 import PageControls from "@/components/PageControls";
 import { detectBestOrientation } from "@/app/process/detectTextOrientationWithOCR";
 
-
 import { RotateCw } from "lucide-react";
 
-import { PDFDocument, degrees } from "pdf-lib";
+import { PDFDocument, PDFPage, degrees } from "pdf-lib";
 
 export default function ProcessPage() {
   const searchParams = useSearchParams();
@@ -207,9 +206,13 @@ export default function ProcessPage() {
       const pages = pdfDoc.getPages();
 
       fileEntry.pages.forEach((pageInfo, index) => {
-        pages[index].setRotation(degrees((pageInfo.origRotation+pageInfo.rotation + rotation % 360))); // Apply rotation to each page
-        console.log(`Setting rotation for page ${index + 1}:`, (pageInfo.origRotation + pageInfo.rotation + rotation) % 360);
-
+        pages[index].setRotation(
+          degrees(pageInfo.origRotation + pageInfo.rotation + (rotation % 360))
+        ); // Apply rotation to each page
+        console.log(
+          `Setting rotation for page ${index + 1}:`,
+          (pageInfo.origRotation + pageInfo.rotation + rotation) % 360
+        );
       });
 
       const pdfBytes = await pdfDoc.save();
@@ -219,6 +222,45 @@ export default function ProcessPage() {
       link.download = `rotated-${fileEntry.id}.pdf`;
       link.click();
     }
+  }
+
+  async function handleOnMerge(fileEntries: FileEntry[]) {
+    const mergedPdfDoc = await PDFDocument.create();
+
+    for (const fileEntry of fileEntries) {
+      const existingPdfBytes = await fetch(fileEntry.publicUrl).then((res) =>
+        res.arrayBuffer()
+      );
+      const srcDoc = await PDFDocument.load(existingPdfBytes);
+      const pages = srcDoc.getPages();
+
+      fileEntry.pages.forEach((pageInfo, index) => {
+        pages[index].setRotation(
+          degrees(pageInfo.origRotation + pageInfo.rotation + (rotation % 360))
+        ); // Apply rotation to each page
+        console.log(
+          `Setting rotation for page ${index + 1}:`,
+          (pageInfo.origRotation + pageInfo.rotation + rotation) % 360
+        );
+      });
+
+      const copiedPages = await mergedPdfDoc.copyPages(
+        srcDoc,
+        srcDoc.getPageIndices()
+      );
+
+      // add each copied page into mergedPdfDoc
+      copiedPages.forEach((page) => {
+        mergedPdfDoc.addPage(page);
+      });
+    }
+
+    const pdfBytes = await mergedPdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `rotated-merged.pdf`;
+    link.click();
   }
 
   return (
@@ -288,6 +330,7 @@ export default function ProcessPage() {
           onReset={handleOnReset}
           onSetOrientation={(mode) => handleOnSetOrientation(mode)} // ✅ update on toggle
           onFixOrientation={handleOnFixOrientation}
+          onMerge={() => handleOnMerge(Object.values(fileMap))}
           onDownload={() => downloadPdf(Object.values(fileMap))} // Pass the fileMap to the download function
         />
       </div>

@@ -64,7 +64,7 @@ export default function PDFPageCanvas({
     };
     renderThumbnail();
     renderCanvasForOCR();
-gi
+
 }, [url, pageNum, onCanvasReady]);
 
   if (!thumbUrl) return <p>Loading…</p>;
