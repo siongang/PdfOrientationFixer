@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       
-      <body className="flex flex-col max-h-screen">
+      <body className="flex flex-col min-h-screen">
         <Header />
         <main className="flex flex-1 bg-stone-100 overflow-hidden">
           {" "}

@@ -104,9 +104,15 @@ export default function ProcessPage() {
     "none" | "portrait" | "landscape"
   >("none");
 
+  const [orientationState, setOrientationState] = useState<
+    "Not Running" | "Running OCR" | "Done"
+  >("Not Running");
+
   function handleOnReset() {
     setRotation(0);
     setFileMap(defaultFileMap); // Reset to the default state
+    setOrientation("none");
+    setOrientationState("Not Running");
   }
 
   function handleOnRotateLeft() {
@@ -140,6 +146,7 @@ export default function ProcessPage() {
 
   useEffect(() => {
     if (orientation !== "none") {
+      setOrientationState("Running OCR");
       handleOnFixOrientation();
     }
   }, [orientation]);
@@ -181,6 +188,7 @@ export default function ProcessPage() {
         pages: updatedPages,
       };
     }
+    setOrientationState("Done");
 
     setFileMap(updatedMap);
     console.log("Updated fileMap:", updatedMap);
@@ -266,6 +274,13 @@ export default function ProcessPage() {
   return (
     <main className="flex-1 grid grid-cols-[1fr_30rem] bg-white text-black">
       <div className="flex-1 overflow-auto">
+        <p className="text-xs text-neutral-500 text-center mt-2">
+          {(orientationState === "Running OCR" &&
+            "Running OCR on all pages. Please wait...") ||
+            (orientationState === "Done" &&
+              "All pages are fixed. You can download the PDFs now.")}
+        </p>
+
         {fileIds.map((id: string) => {
           return (
             // Parent Div for each File Preview track
@@ -277,7 +292,7 @@ export default function ProcessPage() {
                     // Child Div for each page in the file
                     <div
                       key={id + pageInfo.pageNum}
-                      className="group w-[190px] h-[261px] flex flex-col items-center justify-center p-2 relative onhover:shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all duration-200 ease-in-out"
+                      className="group w-[190px] h-[261px] rounded -lg flex flex-col items-center justify-center p-2 relative onhover:shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all duration-200 ease-in-out"
                       style={{}}
                     >
                       <button
@@ -321,7 +336,7 @@ export default function ProcessPage() {
         })}
         {/* You can fetch or preview the file using this ID */}
       </div>
-      <div className="items-center">
+      <div className="items-center h-full">
         <PageControls
           rotation={rotation}
           orientation={orientation} // ✅ pass current state
@@ -332,6 +347,7 @@ export default function ProcessPage() {
           onFixOrientation={handleOnFixOrientation}
           onMerge={() => handleOnMerge(Object.values(fileMap))}
           onDownload={() => downloadPdf(Object.values(fileMap))} // Pass the fileMap to the download function
+          orientationState={orientationState} // Pass the state to the component
         />
       </div>
     </main>

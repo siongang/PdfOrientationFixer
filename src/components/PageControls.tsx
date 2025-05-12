@@ -3,6 +3,7 @@
 import { RotateCcw, RotateCw } from "lucide-react";
 
 type OrientationMode = "none" | "portrait" | "landscape";
+type OrientationState = "Not Running"| "Running OCR" | "Done";
 
 type Props = {
   rotation: number;
@@ -14,6 +15,7 @@ type Props = {
   onFixOrientation: () => void;
   onMerge: () => void;
   onDownload: () => void;
+  orientationState: OrientationState
 };
 
 export default function PageControls({
@@ -25,6 +27,7 @@ export default function PageControls({
   onSetOrientation,
   onMerge,
   onDownload,
+  orientationState,
 }: Props) {
   const orientationButtons: { label: string; value: OrientationMode }[] = [
     { label: "None", value: "none" },
@@ -115,10 +118,7 @@ export default function PageControls({
         >
           Download PDFs
         </button>
-        <p className="text-xs text-neutral-500 text-center mt-2">
-          Rotation: {rotation}°<br />
-          Orientation: {orientation}
-        </p>
+
       </div>
     </div>
   );
