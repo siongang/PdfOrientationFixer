@@ -9,7 +9,7 @@ export default function Header() {
         PDF Orientation Fixer
       </Link>
       <a
-        href="https://github.com/your-username/your-repo"
+        href="https://github.com/siongang/PdfOrientationFixer"
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 px-4 py-2 rounded-md  hover:text-gray-600 transition"
