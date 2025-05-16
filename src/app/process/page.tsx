@@ -117,13 +117,41 @@ export default function ProcessPage() {
 
   function handleOnRotateLeft() {
     setRotation((r) => (r - 90 + 360) % 360);
+    setFileMap((prev) => {
+      const newMap: FileData = {};
+      for (const [id, fileEntry] of Object.entries(prev)) {
+        newMap[id] = {
+          ...fileEntry,
+          pages: fileEntry.pages.map((p) => ({
+            ...p,
+            orientation:
+              p.orientation === "portrait" ? "landscape" : "portrait",
+          })),
+        };
+      }
+      return newMap;
+    });
   }
   function handleOnRotateRight() {
     setRotation((r) => (r + 90) % 360);
+    setFileMap((prev) => {
+      const newMap: FileData = {};
+      for (const [id, fileEntry] of Object.entries(prev)) {
+        newMap[id] = {
+          ...fileEntry,
+          pages: fileEntry.pages.map((p) => ({
+            ...p,
+            orientation:
+              p.orientation === "portrait" ? "landscape" : "portrait",
+          })),
+        };
+      }
+      return newMap;
+    });
   }
   function handleOnSetOrientation(mode: "none" | "portrait" | "landscape") {
     setOrientation(mode);
-    setRotation(0);
+    // setRotation(0);
     setFileMap((prev) => {
       const newMap: FileData = {};
       for (const [id, fileEntry] of Object.entries(prev)) {
@@ -142,6 +170,8 @@ export default function ProcessPage() {
       }
       return newMap;
     });
+
+
   }
 
   useEffect(() => {
@@ -152,7 +182,7 @@ export default function ProcessPage() {
   }, [orientation]);
 
   async function handleOnFixOrientation() {
-    setRotation(0);
+
     const updatedMap: FileData = {};
     console.log("fixing orientation", fileMap);
     for (const [id, fileEntry] of Object.entries(fileMap)) {
@@ -165,7 +195,9 @@ export default function ProcessPage() {
             "rotating this page right jnow",
             page.rotation,
             "page num",
-            page.pageNum
+            page.pageNum,
+            "page orientation:",
+            page.orientation
           );
           const result = await detectBestOrientation(
             canvas,
@@ -189,6 +221,8 @@ export default function ProcessPage() {
       };
     }
     setOrientationState("Done");
+    setOrientation("none");
+    // setRotation(0);
 
     setFileMap(updatedMap);
     console.log("Updated fileMap:", updatedMap);
@@ -198,9 +232,14 @@ export default function ProcessPage() {
     setFileMap((prev) => {
       const newMap = structuredClone(prev); // Deep clone for safety (optional but safer)
       const page = newMap[id]?.pages.find((p) => p.pageNum === pageNum);
+      console.log("previous orientation", page?.orientation);
       if (page) {
         page.rotation = (page.rotation + 90) % 360;
+        page.orientation =
+          page.orientation === "portrait" ? "landscape" : "portrait";
       }
+      console.log("new orientation", page?.orientation);
+      
       return newMap;
     });
   }
@@ -299,7 +338,7 @@ export default function ProcessPage() {
                         className="absolute top-2 right-2 p-1 rounded-full bg-white text-gray-700 shadow hover:bg-gray-100 hover:text-black transition-opacity opacity-0 group-hover:opacity-100"
                         onClick={() => {
                           rotateSinglePage(id, pageInfo.pageNum);
-                          console.log("Rotating page", pageInfo.pageNum);
+                      
                         }}
                       >
                         <RotateCw className="w-4 h-4" />
