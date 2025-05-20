@@ -1,16 +1,17 @@
 "use client";
 
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient.ts";
 import { useSearchParams } from "next/navigation";
 
 import { useEffect, useMemo, useState } from "react";
-import PDFPageCanvas from "@/components/PDFPageCanvas";
-import PageControls from "@/components/PageControls";
-import { detectBestOrientation } from "@/app/process/detectTextOrientationWithOCR";
+import PDFPageCanvas from "../../components/PDFPageCanvas.tsx";
+import PageControls from "../../components/PageControls.tsx";
+import { detectBestOrientation } from "./detectTextOrientationWithOCR.ts";
 
 import { RotateCw } from "lucide-react";
 
 import { PDFDocument, degrees } from "pdf-lib";
+import { get } from "node:http";
 
 export default function ProcessPage() {
   const searchParams = useSearchParams();
@@ -65,23 +66,61 @@ export default function ProcessPage() {
         const numPages = pdf.numPages;
         // List of PageInfo objects
         const pageData: PageInfo[] = [];
-        for (let i = 1; i <= numPages; i++) {
-          const page = await pdf.getPage(i);
-          const origRotation = page.rotate;
-          const viewport = page.getViewport({ scale: 1 }); // scale=1 gives actual size
-          const width = viewport.width;
-          const height = viewport.height;
-          const orientation = width > height ? "landscape" : "portrait";
-          pageData.push({
-            pageNum: i,
-            rotation: 0,
-            origRotation,
-            width,
-            height,
-            orientation,
-          });
-          console.log("hi", width);
-        }
+
+        const getPageData = async (numPages: number, batchSize: number) => {
+          for (let i = 1; i <= numPages; i += batchSize) {
+            const batch = Array.from(
+              { length: batchSize },
+              (_, index) => i + index
+            ).filter((pageNum) => pageNum <= numPages);
+
+            console.time("batch");
+            const promises = batch.map(async (pageNum) => {
+              const page = await pdf.getPage(pageNum);
+              const origRotation = page.rotate;
+              const viewport = page.getViewport({ scale: 1 }); // scale=1 gives actual size
+              const width = viewport.width;
+              const height = viewport.height;
+              const orientation = width > height ? "landscape" : "portrait" as "landscape" | "portrait";;
+              return {
+                "pageNum": pageNum,
+                rotation: 0,
+                origRotation,
+                width,
+                height,
+                orientation,
+              } as PageInfo;
+            });
+            
+            const renderedBatchedPages: PageInfo[] = await Promise.all(promises);
+            console.timeEnd("batch"); // logs duration of each batch
+            pageData.push(...renderedBatchedPages);
+          }
+
+          return pageData;
+        };
+
+        await getPageData(numPages, 5)
+
+        
+
+        // for (let i = 1; i <= numPages; i++) {
+        //   const page = await pdf.getPage(i);
+        //   const origRotation = page.rotate;
+        //   const viewport = page.getViewport({ scale: 1 }); // scale=1 gives actual size
+        //   const width = viewport.width;
+        //   const height = viewport.height;
+        //   const orientation = width > height ? "landscape" : "portrait";
+        //   pageData.push({
+        //     pageNum: i,
+        //     rotation: 0,
+        //     origRotation,
+        //     width,
+        //     height,
+        //     orientation,
+        //   });
+        //   console.log("hi", width);
+        // }
         newMap[id] = { id: id, publicUrl: url, pages: pageData };
       }
       setFileMap(newMap);
@@ -170,8 +209,6 @@ export default function ProcessPage() {
       }
       return newMap;
     });
-
-
   }
 
   useEffect(() => {
@@ -182,7 +219,6 @@ export default function ProcessPage() {
   }, [orientation]);
 
   async function handleOnFixOrientation() {
-
     const updatedMap: FileData = {};
     console.log("fixing orientation", fileMap);
     for (const [id, fileEntry] of Object.entries(fileMap)) {
@@ -239,7 +275,7 @@ export default function ProcessPage() {
           page.orientation === "portrait" ? "landscape" : "portrait";
       }
       console.log("new orientation", page?.orientation);
-      
+
       return newMap;
     });
   }
@@ -338,7 +374,6 @@ export default function ProcessPage() {
                         className="absolute top-2 right-2 p-1 rounded-full bg-white text-gray-700 shadow hover:bg-gray-100 hover:text-black transition-opacity opacity-0 group-hover:opacity-100"
                         onClick={() => {
                           rotateSinglePage(id, pageInfo.pageNum);
-                      
                         }}
                       >
                         <RotateCw className="w-4 h-4" />

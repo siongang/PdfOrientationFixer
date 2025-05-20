@@ -49,6 +49,7 @@ export default function HomePage() {
       </p>
 
       <button
+      type="button"
         onClick={() => {
           inputRef.current?.click();
         }}
