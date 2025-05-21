@@ -347,7 +347,7 @@ export default function ProcessPage() {
   }
 
   return (
-    <main className="flex-1 grid grid-cols-[1fr_30rem] bg-white text-black">
+    <main className="flex-1 grid grid-cols-[1fr_30rem] h-full bg-white text-black overflow-hidden">
       <div className="flex-1 overflow-auto">
         <p className="text-xs text-neutral-500 text-center mt-2">
           {(orientationState === "Running OCR" &&
@@ -367,10 +367,11 @@ export default function ProcessPage() {
                     // Child Div for each page in the file
                     <div
                       key={id + pageInfo.pageNum}
-                      className="group w-[190px] h-[261px] rounded -lg flex flex-col items-center justify-center p-2 relative onhover:shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all duration-200 ease-in-out"
+                      className="group w-[190px] h-[261px] rounded-lg flex flex-col items-center justify-center p-2 relative onhover:shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all duration-200 ease-in-out"
                       style={{}}
                     >
                       <button
+                        type="button"
                         className="absolute top-2 right-2 p-1 rounded-full bg-white text-gray-700 shadow hover:bg-gray-100 hover:text-black transition-opacity opacity-0 group-hover:opacity-100"
                         onClick={() => {
                           rotateSinglePage(id, pageInfo.pageNum);
@@ -410,7 +411,7 @@ export default function ProcessPage() {
         })}
         {/* You can fetch or preview the file using this ID */}
       </div>
-      <div className="items-center h-full">
+      <div className="items-center overflow-hidden h-full">
         <PageControls
           orientation={orientation} // ✅ pass current state
           onRotateLeft={handleOnRotateLeft}

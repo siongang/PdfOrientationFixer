@@ -38,7 +38,7 @@ export default function HomePage() {
     }
   };
   return (
-    <main className="w-full flex flex-col items-center min-h-screen px-6 py-16 items-center text-black gap-8 text-center">
+    <main className="w-full h-full flex flex-col items-center px-6 py-16 items-center text-black gap-8 text-center">
       <p className="max-w-2xl text-lg items-center leading-relaxed">
         Ever had lecture notes or documents with randomly rotated pages? Instead
         of rotating your head to read, use{" "}
