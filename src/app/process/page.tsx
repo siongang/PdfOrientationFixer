@@ -11,6 +11,8 @@ import { detectBestOrientation } from "./detectTextOrientationWithOCR.ts";
 import { RotateCw } from "lucide-react";
 
 import { PDFDocument, degrees } from "pdf-lib";
+import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
+
 // import { get } from "node:http";
 
 export default function ProcessPage() {
@@ -20,6 +22,7 @@ export default function ProcessPage() {
   // const [publicFileUrls, setPublicFileUrls] = useState<string[]>([]);
 
   type PageInfo = {
+    pageDoc: PDFPageProxy;
     pageNum: number;
     rotation: number;
     origRotation: number; // Original rotation from the PDF
@@ -31,6 +34,7 @@ export default function ProcessPage() {
   type FileEntry = {
     id: string;
     publicUrl: string;
+    pdfDoc?: PDFDocumentProxy;
     pages: PageInfo[];
   };
   type FileData = Record<string, FileEntry>;
@@ -46,7 +50,6 @@ export default function ProcessPage() {
   function registerCanvas(key: string, canvas: HTMLCanvasElement) {
     if (!canvasRefs[key]) {
       canvasRefs[key] = canvas;
-      console.log("Canvas registered:", key, canvas);
     }
   }
 
@@ -56,6 +59,7 @@ export default function ProcessPage() {
       const pdfjsLib = require("pdfjs-dist");
       pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
+      console.log("building file map", fileIds);
       // Parent Div
       const newMap: FileData = {};
       for (const id of fileIds) {
@@ -81,9 +85,13 @@ export default function ProcessPage() {
               const viewport = page.getViewport({ scale: 1 }); // scale=1 gives actual size
               const width = viewport.width;
               const height = viewport.height;
-              const orientation = width > height ? "landscape" : "portrait" as "landscape" | "portrait";;
+              const orientation =
+                width > height
+                  ? "landscape"
+                  : ("portrait" as "landscape" | "portrait");
               return {
-                "pageNum": pageNum,
+                pageDoc: page,
+                pageNum: pageNum,
                 rotation: 0,
                 origRotation,
                 width,
@@ -91,8 +99,10 @@ export default function ProcessPage() {
                 orientation,
               } as PageInfo;
             });
-            
-            const renderedBatchedPages: PageInfo[] = await Promise.all(promises);
+
+            const renderedBatchedPages: PageInfo[] = await Promise.all(
+              promises
+            );
             console.timeEnd("batch"); // logs duration of each batch
             pageData.push(...renderedBatchedPages);
           }
@@ -100,9 +110,7 @@ export default function ProcessPage() {
           return pageData;
         };
 
-        await getPageData(numPages, 5)
-
-        
+        await getPageData(numPages, 5);
 
         // for (let i = 1; i <= numPages; i++) {
         //   const page = await pdf.getPage(i);
@@ -121,12 +129,13 @@ export default function ProcessPage() {
         //   });
         //   console.log("hi", width);
         // }
-        newMap[id] = { id: id, publicUrl: url, pages: pageData };
+        newMap[id] = { id: id, publicUrl: url, pdfDoc: pdf, pages: pageData };
       }
       setFileMap(newMap);
       setDefaultFileMap(newMap); // Store the default state
     };
     buildFileMap();
+    console.log("finished building file map", fileMap);
   }, [fileIds]);
 
   // const pagesInitial = fileIds.map((id: string) => ({
@@ -266,17 +275,37 @@ export default function ProcessPage() {
 
   function rotateSinglePage(id: string, pageNum: number) {
     setFileMap((prev) => {
-      const newMap = structuredClone(prev); // Deep clone for safety (optional but safer)
-      const page = newMap[id]?.pages.find((p) => p.pageNum === pageNum);
-      console.log("previous orientation", page?.orientation);
-      if (page) {
-        page.rotation = (page.rotation + 90) % 360;
-        page.orientation =
-          page.orientation === "portrait" ? "landscape" : "portrait";
-      }
-      console.log("new orientation", page?.orientation);
+      return {
+        ...prev,
+        [id]: {
+          ...prev[id],
+          pages: prev[id].pages.map((p) => {
+            if (p.pageNum === pageNum) {
+              return {
+                ...p,
+                rotation: (p.rotation + 90) % 360,
+                orientation:
+                  p.orientation === "portrait" ? "landscape" : "portrait",
+              };
+            }
+            return p;
+          }),
+        },
+        // }
+        // console.log("rotating single page", id, pageNum);
+        // const newMap = { ...prev }; // Shallow clone
+        // // const newMap = structuredClone(prev); // Deep clone for safety (optional but safer)
+        // const page = newMap[id]?.pages.find((p) => p.pageNum === pageNum);
+        // console.log("previous orientation", page?.orientation);
+        // if (page) {
+        //   page.rotation = (page.rotation + 90) % 360;
+        //   page.orientation =
+        //     page.orientation === "portrait" ? "landscape" : "portrait";
+        // }
+        // console.log("new orientation", page?.orientation);
 
-      return newMap;
+        // return newMap;
+      };
     });
   }
 
@@ -389,6 +418,7 @@ export default function ProcessPage() {
                       >
                         <PDFPageCanvas
                           url={fileMap[id].publicUrl}
+                          pageDoc={pageInfo.pageDoc}
                           pageNum={pageInfo.pageNum}
                           scale={0.18}
                           onCanvasReady={(canvas) =>
